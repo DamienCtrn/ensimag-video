@@ -13,13 +13,13 @@ set(CMAKE_BUILD_TYPE Debug)
 #########
 # Vous devez editer les lignes suivantes pour y mettre vos logins
 #########
-set(LOGINS login1 login2 login3)
+set(LOGINS chakmaa cathrind)
 
 # Vérification du renseignement des login
 list(SORT LOGINS)
-if (LOGINS MATCHES "login[123]")
+if (LOGINS MATCHES "login[12]")
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
-endif(LOGINS MATCHES "login[123]")
+endif(LOGINS MATCHES "login[12]")
 
 # Trouver la SDL2, ogg, theora et vorbis avec pkgconfig
 execute_process(COMMAND pkg-config --cflags ogg vorbis theora theoradec sdl2 OUTPUT_VARIABLE ALL_PKG_CFLAGS)
