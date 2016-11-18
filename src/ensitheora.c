@@ -10,6 +10,7 @@ int windowsy = 0;
 
 int tex_iaff= 0;
 int tex_iwri= 0;
+int tex_ilect = 0;
 
 
 static SDL_Window *screen = NULL;
@@ -56,8 +57,11 @@ void *draw2SDL(void *arg) {
 
     /* Protéger l'accès à la hashmap */
 
+    pthread_mutex_lock(&mutex_hashmap);
+    
     HASH_FIND_INT( theorastrstate, &serial, s );
 
+    pthread_mutex_unlock(&mutex_hashmap);
 
 
     assert(s->strtype == TYPE_THEORA);
@@ -86,6 +90,7 @@ void *draw2SDL(void *arg) {
 	int delaims = (int) (texturedate[tex_iaff].timems - timemsfromstart);
 	
 	tex_iaff = (tex_iaff + 1) % NBTEX;
+	tex_ilect ++;
 
 	finConsommerTexture();
 

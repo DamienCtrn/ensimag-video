@@ -7,16 +7,21 @@
 
 extern bool fini;
 
+// Déclaration des variables globales windowsx et windowsy ????
+// extern int windowsx;
+// extern int windowsy;
 
 /* Les extern des variables pour la synchro ici */
 
 extern pthread_mutex_t mutex_hashmap;
 
 extern pthread_mutex_t mutex_fenetre;
-extern pthread_cond_t cond_fenetre;
+extern pthread_cond_t cons_fenetre;
+extern pthread_cond_t prod_fenetre;
 
 extern pthread_mutex_t mutex_texture;
-extern pthread_cond_t cond_texture;
+extern pthread_cond_t cons_texture;
+extern pthread_cond_t prod_texture;
 
 /* Fonctions de synchro à implanter */
 

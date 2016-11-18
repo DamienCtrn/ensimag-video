@@ -9,35 +9,70 @@ bool fini;
 pthread_mutex_t mutex_hashmap = PTHREAD_MUTEX_INITIALIZER;
 
 pthread_mutex_t mutex_fenetre = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond_fenetre = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cons_fenetre = PTHREAD_COND_INITIALIZER;
+pthread_cond_t prod_fenetre = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t mutex_texture = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond_texture = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cons_texture = PTHREAD_COND_INITIALIZER;
+pthread_cond_t prod_texture = PTHREAD_COND_INITIALIZER;
 
 /* l'implantation des fonctions de synchro ici */
 void envoiTailleFenetre(th_ycbcr_buffer buffer) {
     pthread_mutex_lock(&mutex_fenetre);
+
+    windowsx = buffer[0].width;
+    windowsy = buffer[0].height;
+
+    pthread_cond_signal(&cons_fenetre);
+    
+    pthread_mutex_unlock(&mutex_fenetre);
+    
 }
 
 void attendreTailleFenetre() {
+    pthread_mutex_lock(&mutex_fenetre);
 
+    pthread_cond_wait(&cons_fenetre);
+
+    pthread_mutex_unlock(&mutex_fenetre);
 }
 
 void signalerFenetreEtTexturePrete() {
+    pthread_mutex_lock(&mutex_fenetre);
+
+    pthread_cond_signal(&prod_fenetre);
+
+    pthread_mutex_unlock(&mutex_fenetre);
+
 }
 
 void attendreFenetreTexture() {
+    pthread_mutex_lock(&mutex_fenetre);
+
+    pthread_cond_wait(&prod_fenetre);
+
+    pthread_mutex_unlock(&mutex_fenetre);
+    
 }
 
 void debutConsommerTexture() {
+    pthread_mutex_lock(&mutex_texture);
+
+    pthread_cond_wait(&cons_texture);    
 }
 
 void finConsommerTexture() {
+    pthrea_mutex_unlock(&mutex_texture);
 }
 
 
 void debutDeposerTexture() {
+    pthread_mutex_lock(&mutex_texture);
+
 }
 
 void finDeposerTexture() {
+    pthread_cond_signal(&cons_texture);
+
+    pthread_mutex_unlock(&mutex_texture);
 }
