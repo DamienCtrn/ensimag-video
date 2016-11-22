@@ -10,8 +10,8 @@ int windowsy = 0;
 
 int tex_iaff= 0;
 int tex_iwri= 0;
-int tex_ilect = 0;
-
+int tex_dispo = NBTEX;
+int tex_pretes = 0;
 
 static SDL_Window *screen = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -20,7 +20,8 @@ struct TextureDate texturedate[NBTEX] = {};
 struct streamstate *theorastrstate=NULL;
 
 void *draw2SDL(void *arg) {
-    int serial = (int) (long long int) arg;
+    //int serial = (int) (long long int) arg;
+    int serial = *((int *) arg);
     struct streamstate *s= NULL;
 
     attendreTailleFenetre();
@@ -42,6 +43,9 @@ void *draw2SDL(void *arg) {
     SDL_RenderPresent(renderer);
 
 
+    
+
+    
     // la texture
     for(int i=0; i < NBTEX; i++) {
 	texturedate[i].texture = SDL_CreateTexture(renderer,
@@ -50,9 +54,14 @@ void *draw2SDL(void *arg) {
 						   windowsx,
 						   windowsy);
 	texturedate[i].timems = 0.0;
+
 	assert(texturedate[i].texture);
     }
-
+    tex_pretes = 1;    
+    
+    /* if (text_prete != 0) */
+    /* 	printf( */
+    /* else */
     signalerFenetreEtTexturePrete();
 
     /* Protéger l'accès à la hashmap */
@@ -62,14 +71,14 @@ void *draw2SDL(void *arg) {
 
     HASH_FIND_INT( theorastrstate, &serial, s );
 
-    printf("\ns->strtype = %u",s->strtype);
+    //    printf("\ns->strtype = %u",s->strtype);
 
     pthread_mutex_unlock(&mutex_hashmap);
     printf("\nensitheora.c --> Draw2SDL : unlock");
 
     
 
-    //assert(s->strtype == TYPE_THEORA);
+    assert(s->strtype == TYPE_THEORA);
     
     while(! fini) {
 	// récupérer les évenements de fin
@@ -95,7 +104,7 @@ void *draw2SDL(void *arg) {
 	int delaims = (int) (texturedate[tex_iaff].timems - timemsfromstart);
 	
 	tex_iaff = (tex_iaff + 1) % NBTEX;
-
+	tex_dispo++;
 
 	finConsommerTexture();
 
@@ -147,7 +156,7 @@ void theora2SDL(struct streamstate *s) {
     texturedate[tex_iwri].timems = framedate * 1000;
     assert(res == 0);
     tex_iwri = (tex_iwri + 1) % NBTEX;
-
+    tex_dispo--; 
     
     finDeposerTexture();		
 }

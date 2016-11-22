@@ -4,6 +4,8 @@
 bool fini;
 extern int tex_iwri;
 extern int tex_iaff;
+extern int tex_dispo;
+extern int tex_pretes;
 
 /* les variables pour la synchro, ici */
 
@@ -21,7 +23,7 @@ pthread_cond_t prod_texture = PTHREAD_COND_INITIALIZER;
 /* l'implantation des fonctions de synchro ici */
 void envoiTailleFenetre(th_ycbcr_buffer buffer) {
     pthread_mutex_lock(&mutex_fenetre);
-    printf("\nenvoiTailleFenetre");
+    printf("\nsynchro.c ---> envoiTailleFenetre");
     
     windowsx = buffer[0].width;
     windowsy = buffer[0].height;
@@ -56,7 +58,8 @@ void attendreFenetreTexture() {
     pthread_mutex_lock(&mutex_fenetre);
     printf("\nattendreFenetreTexture");
 
-    pthread_cond_wait(&prod_fenetre,&mutex_fenetre);
+    while (tex_pretes != 1)
+	pthread_cond_wait(&prod_fenetre,&mutex_fenetre);
 
     pthread_mutex_unlock(&mutex_fenetre);
     
@@ -66,10 +69,9 @@ void debutConsommerTexture() {
     pthread_mutex_lock(&mutex_texture);
     printf("\ndebutConsommerTexture");
     
-    while (tex_iaff > tex_iwri){
+    while (tex_dispo == 0){
 	pthread_cond_wait(&cons_texture,&mutex_texture);
     }
-    //tex_ilect --;
     
     pthread_mutex_unlock(&mutex_texture);
 }
@@ -88,10 +90,9 @@ void debutDeposerTexture() {
     pthread_mutex_lock(&mutex_texture);
     printf("\ndebutDeposerTexture");
     
-    while (tex_iwri > tex_iaff ){
+    while (tex_dispo == NBTEX ){
 	pthread_cond_wait(&prod_texture,&mutex_texture);
     }
-    //tex_ilect++;
     
     pthread_mutex_unlock(&mutex_texture);    
 }
@@ -101,5 +102,6 @@ void finDeposerTexture() {
     printf("\nfinDeposerTexture");
     
     pthread_cond_signal(&cons_texture);
+
     pthread_mutex_unlock(&mutex_texture);
 }

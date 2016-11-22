@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     }
     assert(argc == 2);
 
-
+    
     // Initialisation de la SDL
     res = SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_EVENTS);
     atexit(SDL_Quit);

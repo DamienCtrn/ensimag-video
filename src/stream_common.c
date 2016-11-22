@@ -47,18 +47,18 @@ void pageReader(FILE *vf, ogg_sync_state *pstate, ogg_page *ppage) {
 struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 				   enum streamtype type) {
     // trouver le stream associé à la page ou le construire
-    int serial = ogg_page_serialno( ppage );
+    int user_serial = ogg_page_serialno( ppage );
     int bos = ogg_page_bos( ppage );
 
     struct streamstate *s= NULL;
     if (bos) { // début de stream
 	s = malloc(sizeof(struct streamstate));
-	s->serial = serial;
+	s->serial = user_serial;
 	s->nbpacket = 0;
 	s->nbpacketoutsync = 0;
 	s->strtype = TYPE_UNKNOW;
 	s->headersRead = false;
-	int res = ogg_stream_init( & s->strstate, serial );
+	int res = ogg_stream_init( & s->strstate, user_serial );
 	th_info_init(& s->th_dec.info);
 	th_comment_init(& s->th_dec.comment);
 	vorbis_info_init( & s->vo_dec.info);
@@ -70,11 +70,11 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 	printf("\nstream_common.c ---> getStreamState : lock 1");
     
 	if (type == TYPE_THEORA){
-	    printf("flux theora --->  hash_add_int");
+	    printf("\nflux theora --->  hash_add_int");
 	    HASH_ADD_INT( theorastrstate, serial, s );
 	}
 	else{
-	    printf("flux vorbis --->  hash_add_int");
+	    printf("\nflux vorbis --->  hash_add_int");
 	    HASH_ADD_INT( vorbisstrstate, serial, s );
 	}
 	pthread_mutex_unlock(&mutex_hashmap);
@@ -87,10 +87,12 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 	printf("\nstream_common.c ---> getStreamState : lock 2");
     
 	if (type == TYPE_THEORA){
-	    HASH_FIND_INT( theorastrstate, & serial, s );
+	    printf("\nflux theora --->  hash_find_int");
+	    HASH_FIND_INT( theorastrstate, &user_serial, s );
 	}
 	else{
-	    HASH_FIND_INT( vorbisstrstate, & serial, s );
+	    printf("\nflux vorbis --->  hash_find_int");
+	    HASH_FIND_INT( vorbisstrstate, &user_serial, s );
 	}
 
 	pthread_mutex_unlock(&mutex_hashmap);
