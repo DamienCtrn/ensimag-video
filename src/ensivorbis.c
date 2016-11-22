@@ -24,6 +24,7 @@ void vorbis2SDL(struct streamstate *s) {
 	want.callback = NULL;
 
 	audioid = SDL_OpenAudioDevice(NULL, false, & want, & have, 0 );
+	
 	SDL_PauseAudioDevice(audioid, 0);
 	// start point
 	clock_gettime( CLOCK_REALTIME, & datedebut);

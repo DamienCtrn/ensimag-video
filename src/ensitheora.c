@@ -58,13 +58,18 @@ void *draw2SDL(void *arg) {
     /* Protéger l'accès à la hashmap */
 
     pthread_mutex_lock(&mutex_hashmap);
-    
+    printf("\nensitheora.c --> Draw2SDL : lock");    
+
     HASH_FIND_INT( theorastrstate, &serial, s );
 
+    printf("\ns->strtype = %u",s->strtype);
+
     pthread_mutex_unlock(&mutex_hashmap);
+    printf("\nensitheora.c --> Draw2SDL : unlock");
 
+    
 
-    assert(s->strtype == TYPE_THEORA);
+    //assert(s->strtype == TYPE_THEORA);
     
     while(! fini) {
 	// récupérer les évenements de fin
@@ -90,7 +95,7 @@ void *draw2SDL(void *arg) {
 	int delaims = (int) (texturedate[tex_iaff].timems - timemsfromstart);
 	
 	tex_iaff = (tex_iaff + 1) % NBTEX;
-	tex_ilect ++;
+
 
 	finConsommerTexture();
 
@@ -143,5 +148,6 @@ void theora2SDL(struct streamstate *s) {
     assert(res == 0);
     tex_iwri = (tex_iwri + 1) % NBTEX;
 
+    
     finDeposerTexture();		
 }

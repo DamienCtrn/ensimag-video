@@ -7,7 +7,7 @@
 
 bool fini = false;
 
-extern pthread_t *taffichage;
+extern pthread_t taffichage;
 
 struct timespec datedebut;
 
@@ -67,18 +67,21 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
 	// proteger l'accès à la hashmap
     pthread_mutex_lock(&mutex_hashmap);
-
+    printf("\nstream_common.c ---> getStreamState : lock 1");
+    
 	if (type == TYPE_THEORA)
 	    HASH_ADD_INT( theorastrstate, serial, s );
 	else
 	    HASH_ADD_INT( vorbisstrstate, serial, s );
 
     pthread_mutex_unlock(&mutex_hashmap);
+    printf("\nstream_common.c ---> getStreamState : unlock 1");
     }
 
     else {
 	// proteger l'accès à la hashmap
     pthread_mutex_lock(&mutex_hashmap);
+    printf("\nstream_common.c ---> getStreamState : lock 2");
 
 	if (type == TYPE_THEORA)
 	    HASH_FIND_INT( theorastrstate, & serial, s );
@@ -88,6 +91,7 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 	assert(s != NULL);
 
     pthread_mutex_unlock(&mutex_hashmap);
+    printf("\nstream_common.c ---> getStreamState : unlock 2");
     }
     assert(s != NULL);
 
@@ -148,8 +152,10 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 
 	    if (type == TYPE_THEORA) {
 		    // lancement du thread gérant l'affichage (draw2SDL)
-	        pthread_create(taffichage, NULL, draw2SDL, (void*)(s->serial));
-		    assert(res == 0);
+	        pthread_create(&taffichage, NULL, &draw2SDL,&(s->serial));
+		printf("\nstream_common.c --> Création du thread 'taffichage'");
+		
+		assert(res == 0);
 	    }
 	}
     }

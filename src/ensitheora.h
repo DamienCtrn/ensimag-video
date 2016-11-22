@@ -19,5 +19,5 @@ void theora2SDL(struct streamstate *s);
 
 extern int windowsx;
 extern int windowsy;
-
+extern int tex_ilect;
 #endif

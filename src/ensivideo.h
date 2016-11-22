@@ -38,4 +38,7 @@ struct streamstate {
 };
 
 
+void * theoraStreamReader(void *arg);
+void * vorbisStreamReader(void *arg);
+
 #endif
